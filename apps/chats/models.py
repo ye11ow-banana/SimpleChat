@@ -53,6 +53,7 @@ class Message(models.Model):
 
     class Meta:
         db_table = 'message'
+        ordering = ('-created',)
 
     def __str__(self) -> str:
         return f'Sent by {self.sender}'
