@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Prefetch
@@ -37,3 +39,12 @@ def get_by_participants_or_create_thread(
         return get_thread_by_participants(participants), False
     except ObjectDoesNotExist:
         return create_thread(data, participants), True
+
+
+def set_thread_last_update(thread_id: int, created: datetime) -> None:
+    """
+    Update `updated` field of a `Thread` object.
+
+    Is needed after creating new message in a thread.
+    """
+    Thread.objects.filter(id=thread_id).update(updated=created)
