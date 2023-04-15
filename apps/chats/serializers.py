@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from . import services
-from .models import Thread
+from .models import Thread, Message
 
 
 class ThreadSerializer(serializers.ModelSerializer):
@@ -30,3 +30,12 @@ class ThreadSerializer(serializers.ModelSerializer):
             validated_data, participants
         )
         return thread
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.StringRelatedField()
+    thread = serializers.StringRelatedField()
+
+    class Meta:
+        model = Message
+        fields = '__all__'

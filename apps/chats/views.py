@@ -1,18 +1,18 @@
-from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView
+from rest_framework import generics
 
-from .models import Thread
-from .serializers import ThreadSerializer
+from .models import Thread, Message
+from .serializers import ThreadSerializer, MessageSerializer
 
 
-class ThreadCreationView(CreateAPIView):
+class ThreadCreationView(generics.CreateAPIView):
     serializer_class = ThreadSerializer
 
 
-class ThreadDestroyView(DestroyAPIView):
+class ThreadDestroyView(generics.DestroyAPIView):
     queryset = Thread.objects
 
 
-class ThreadListView(ListAPIView):
+class ThreadListView(generics.ListAPIView):
     serializer_class = ThreadSerializer
 
     def get_queryset(self):
@@ -20,6 +20,20 @@ class ThreadListView(ListAPIView):
         return Thread.objects.filter(participants=user)
 
 
+class MessageCreationView(generics.CreateAPIView):
+    serializer_class = MessageSerializer
+
+
+class MessageListView(generics.ListAPIView):
+    serializer_class = MessageSerializer
+
+    def get_queryset(self):
+        thread_id = self.kwargs['thread_id']
+        return Message.objects.filter(thread_id=thread_id)
+
+
 thread_creation = ThreadCreationView.as_view()
 thread_destroy = ThreadDestroyView.as_view()
 thread_list = ThreadListView.as_view()
+message_creation = MessageCreationView.as_view()
+message_list = MessageListView.as_view()
