@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
 from .models import Thread, Message
 from .serializers import ThreadSerializer, MessageSerializer
@@ -22,6 +23,13 @@ class ThreadListView(generics.ListAPIView):
 
 class MessageCreationView(generics.CreateAPIView):
     serializer_class = MessageSerializer
+
+    def perform_create(self, serializer):
+        thread_id = self.kwargs['thread_id']
+        threads = Thread.objects.filter(id=thread_id)
+        thread = get_object_or_404(threads)
+        user = self.request.user
+        serializer.save(thread=thread, sender=user)
 
 
 class MessageListView(generics.ListAPIView):
