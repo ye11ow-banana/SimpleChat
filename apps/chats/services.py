@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Prefetch
 
-from .models import Thread
+from .models import Thread, Message
 
 User = get_user_model()
 
@@ -48,3 +48,7 @@ def set_thread_last_update(thread_id: int, created: datetime) -> None:
     Is needed after creating new message in a thread.
     """
     Thread.objects.filter(id=thread_id).update(updated=created)
+
+
+def mark_message_as_read(pk: int) -> None:
+    Message.objects.filter(id=pk).update(is_read=True)
