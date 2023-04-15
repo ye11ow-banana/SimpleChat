@@ -5,6 +5,7 @@ from .models import Thread
 
 
 class ThreadSerializer(serializers.ModelSerializer):
+    participants = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Thread
