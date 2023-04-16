@@ -13,23 +13,23 @@ User = get_user_model()
 
 class ThreadCreationViewTest(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='test_user', password='test_pass')
         self.token = AccessToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer  {self.token}')
         self.url = 'http://127.0.0.1:8000/api/v1/chats/thread/create/'
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         self.client.credentials()
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_post_empty_data(self):
+    def test_post_empty_data(self) -> None:
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_new_thread_created(self):
+    def test_new_thread_created(self) -> None:
         self.user2 = User.objects.create_user(
             username='test_user2', password='test_pass2')
         data = json.dumps(dict(participants=[1, 2]))
@@ -44,7 +44,7 @@ class ThreadCreationViewTest(APITestCase):
             Thread.objects.first().participants.last(), self.user2
         )
 
-    def test_invalid_data_rejected(self):
+    def test_invalid_data_rejected(self) -> None:
         data = dict(participants=[1])
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -52,7 +52,7 @@ class ThreadCreationViewTest(APITestCase):
 
 class ThreadDestroyViewTest(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='test_user', password='test_pass')
         self.token = AccessToken.for_user(self.user)
@@ -64,17 +64,17 @@ class ThreadDestroyViewTest(APITestCase):
         self.url = f'http://127.0.0.1:8000/api/v1/chats/' \
                    f'thread/{self.thread.id}/destroy/'
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         self.client.credentials()
         response = self.client.delete(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_participant_required(self):
+    def test_participant_required(self) -> None:
         self.thread.participants.remove(self.user)
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_thread_destroyed(self):
+    def test_thread_destroyed(self) -> None:
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Thread.objects.count(), 0)
@@ -82,24 +82,24 @@ class ThreadDestroyViewTest(APITestCase):
 
 class ThreadListViewTest(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='test_user', password='test_pass')
         self.token = AccessToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer  {self.token}')
         self.url = 'http://127.0.0.1:8000/api/v1/chats/thread/list/'
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         self.client.credentials()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_get_empty_data(self):
+    def test_get_empty_data(self) -> None:
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
 
-    def test_get_all_threads(self):
+    def test_get_all_threads(self) -> None:
         user2 = User.objects.create_user(
             username='test_user2', password='test_pass2')
         thread = Thread.objects.create()
@@ -115,7 +115,7 @@ class ThreadListViewTest(APITestCase):
         self.assertEqual(response.data[1]['id'], thread2.id)
         self.assertEqual(Thread.objects.count(), 3)
 
-    def test_get_threads_with_pagination(self):
+    def test_get_threads_with_pagination(self) -> None:
         thread = Thread.objects.create()
         thread.participants.set([self.user])
         thread2 = Thread.objects.create()
@@ -129,7 +129,7 @@ class ThreadListViewTest(APITestCase):
 
 class MessageCreationViewTest(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='test_user', password='test_pass')
         self.token = AccessToken.for_user(self.user)
@@ -138,17 +138,17 @@ class MessageCreationViewTest(APITestCase):
         self.thread.participants.set([self.user])
         self.url = f'http://127.0.0.1:8000/api/v1/chats/thread/{self.thread.id}/message/create/'
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         self.client.credentials()
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_participant_required(self):
+    def test_participant_required(self) -> None:
         self.thread.participants.remove(self.user)
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_new_message_created(self):
+    def test_new_message_created(self) -> None:
         data = json.dumps(dict(text="Test text"))
         response = self.client.post(
             self.url, data=data, content_type='application/json')
@@ -160,14 +160,14 @@ class MessageCreationViewTest(APITestCase):
         self.assertEqual(message.thread, self.thread)
         self.assertEqual(message.text, "Test text")
 
-    def test_empty_data(self):
+    def test_empty_data(self) -> None:
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class MessageListViewTest(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='test_user', password='test_pass')
         self.token = AccessToken.for_user(self.user)
@@ -176,22 +176,22 @@ class MessageListViewTest(APITestCase):
         self.thread.participants.set([self.user])
         self.url = f'http://127.0.0.1:8000/api/v1/chats/thread/{self.thread.id}/message/list/'
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         self.client.credentials()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_participant_required(self):
+    def test_participant_required(self) -> None:
         self.thread.participants.remove(self.user)
         response = self.client.post(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_get_empty_data(self):
+    def test_get_empty_data(self) -> None:
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
 
-    def test_get_all_messages(self):
+    def test_get_all_messages(self) -> None:
         user2 = User.objects.create_user(
             username='test_user2', password='test_pass2')
         thread2 = Thread.objects.create()
@@ -210,7 +210,7 @@ class MessageListViewTest(APITestCase):
         self.assertEqual(Thread.objects.count(), 2)
         self.assertEqual(Message.objects.count(), 3)
 
-    def test_get_threads_with_pagination(self):
+    def test_get_threads_with_pagination(self) -> None:
         user2 = User.objects.create_user(
             username='test_user2', password='test_pass2')
         thread2 = Thread.objects.create()
@@ -231,7 +231,7 @@ class MessageListViewTest(APITestCase):
 
 class MessageMarkingAsReadViewTest(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='test_user', password='test_pass')
         self.token = AccessToken.for_user(self.user)
@@ -244,21 +244,21 @@ class MessageMarkingAsReadViewTest(APITestCase):
         self.url = f'http://127.0.0.1:8000/api/v1/chats/' \
                    f'message/{self.message.id}/read/'
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         self.client.credentials()
         response = self.client.patch(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_message_participant_required(self):
+    def test_message_participant_required(self) -> None:
         self.thread.participants.remove(self.user)
         response = self.client.patch(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_not_sender_required(self):
+    def test_not_sender_required(self) -> None:
         response = self.client.patch(self.url, data={})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_message_marked_as_read(self):
+    def test_message_marked_as_read(self) -> None:
         self.user2 = User.objects.create_user(
             username='test_user2', password='test_pass2')
         self.message.sender = self.user2
@@ -272,24 +272,24 @@ class MessageMarkingAsReadViewTest(APITestCase):
 
 class UnreadMessagesNumberViewTest(APITestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = User.objects.create_user(
             username='test_user', password='test_pass')
         self.token = AccessToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer  {self.token}')
         self.url = 'http://127.0.0.1:8000/api/v1/chats/message/number-unread/'
 
-    def test_authentication_required(self):
+    def test_authentication_required(self) -> None:
         self.client.credentials()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_get_empty_data(self):
+    def test_get_empty_data(self) -> None:
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, 0)
 
-    def test_get_unread_messages_number(self):
+    def test_get_unread_messages_number(self) -> None:
         user2 = User.objects.create_user(
             username='test_user2', password='test_pass2')
         thread = Thread.objects.create()

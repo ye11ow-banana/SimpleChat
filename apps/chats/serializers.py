@@ -1,5 +1,6 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from django.contrib.auth import get_user_model
 
 from . import services
 from .models import Thread, Message
@@ -14,7 +15,7 @@ class ThreadSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('created', 'updated')
 
-    def validate_participants(self, value: list[int]) -> list[int]:
+    def validate_participants(self, value: list[User]) -> list[User]:
         """
         Check that a thread can have only 2 participants.
         """
@@ -23,7 +24,7 @@ class ThreadSerializer(serializers.ModelSerializer):
                 'Thread needs to have 2 participants')
         return value
 
-    def to_representation(self, data):
+    def to_representation(self, data: Thread) -> dict:
         participants = [
             {'id': obj.id, 'username': obj.username}
             for obj in data.participants.all()

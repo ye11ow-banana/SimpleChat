@@ -1,5 +1,4 @@
 from requests import Request
-
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
@@ -7,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
+
+from django.db.models import QuerySet
 
 from . import services
 from .models import Thread, Message
@@ -29,7 +30,7 @@ class ThreadListView(generics.ListAPIView):
     serializer_class = ThreadSerializer
     pagination_class = LimitOffsetPagination
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Thread]:
         user = self.request.user
         return Thread.objects.filter(participants=user)
 
@@ -38,7 +39,7 @@ class MessageCreationView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, permissions.IsThreadParticipant]
     serializer_class = MessageSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer: MessageSerializer) -> None:
         thread_id = self.kwargs['pk']
         threads = Thread.objects.filter(id=thread_id)
         thread = get_object_or_404(threads)
@@ -51,7 +52,7 @@ class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
     pagination_class = LimitOffsetPagination
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Message]:
         thread_id = self.kwargs['pk']
         return Message.objects.filter(thread_id=thread_id)
 
