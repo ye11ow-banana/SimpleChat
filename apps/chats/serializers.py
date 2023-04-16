@@ -33,7 +33,7 @@ class ThreadSerializer(serializers.ModelSerializer):
         return representation
 
     def to_internal_value(self, data: dict) -> dict:
-        participants = data['participants']
+        participants = data.get('participants')
         validated_data = super().to_internal_value(data)
         validated_data['participants'] = participants
         return validated_data
