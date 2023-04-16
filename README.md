@@ -18,10 +18,13 @@ SECRET_KEY=
 
 Run Django
 ```sh
-python3 loaddata data.json
+python3 manage.py migrate
 ```
 ```sh
-python3 manage.py migrate
+python3 manage.py loaddata data.json
+```
+```sh
+python3 manage.py test chats
 ```
 ```sh
 python3 manage.py runserver
@@ -39,7 +42,7 @@ data: {"username": "admin", "password": "admin"}
 POST http://127.0.0.1:8000/auth/jwt/create/
 ```
 
-In every request headers:
+Put it in every request headers:
 ```sh
 Authorization: Bearer <ACCESS_TOKEN>
 ```
