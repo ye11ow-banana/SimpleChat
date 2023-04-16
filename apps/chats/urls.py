@@ -9,5 +9,5 @@ urlpatterns = [
     path('thread/<int:thread_id>/message/create/', views.message_creation),
     path('thread/<int:thread_id>/message/list/', views.message_list),
     path('message/<int:pk>/read/', views.message_marking_as_read),
-    path('message/unread/list/', views.unread_message_list),
+    path('message/number-unread/', views.unread_messages_number),
 ]

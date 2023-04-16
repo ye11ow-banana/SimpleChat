@@ -55,11 +55,11 @@ class MessageMarkingAsReadView(APIView):
         return Response(status=HTTP_200_OK)
 
 
-class UnreadMessageListView(generics.ListAPIView):
-    serializer_class = MessageSerializer
+class UnreadMessagesNumberView(APIView):
 
-    def get_queryset(self):
-        return services.get_unread_messages(self.request.user)
+    def get(self, request: Request) -> Response:
+        number = services.get_unread_messages_number(self.request.user)
+        return Response(number, status=HTTP_200_OK)
 
 
 thread_creation = ThreadCreationView.as_view()
@@ -68,4 +68,4 @@ thread_list = ThreadListView.as_view()
 message_creation = MessageCreationView.as_view()
 message_list = MessageListView.as_view()
 message_marking_as_read = MessageMarkingAsReadView.as_view()
-unread_message_list = UnreadMessageListView.as_view()
+unread_messages_number = UnreadMessagesNumberView.as_view()

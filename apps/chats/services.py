@@ -54,12 +54,10 @@ def mark_message_as_read(pk: int) -> None:
     Message.objects.filter(id=pk).update(is_read=True)
 
 
-def get_unread_messages(user: User) -> QuerySet[Message]:
+def get_unread_messages_number(user: User) -> QuerySet[Message]:
     """
-    Get all unread messages of threads that the user have.
+    Get number of all unread messages of threads that the user have.
     """
     threads = Thread.objects.filter(participants=user)
-    messages = Message.objects.select_related('sender', 'thread').only(
-        'text', 'created', 'is_read', 'sender__username', 'thread__id'
-    )
-    return messages.filter(~Q(sender=user), is_read=False, thread__in=threads)
+    messages = Message.objects.select_related('sender', 'thread')
+    return messages.filter(~Q(sender=user), is_read=False, thread__in=threads).count()
