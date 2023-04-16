@@ -1,11 +1,13 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from . import services
 from .models import Thread, Message
 
+User = get_user_model()
+
 
 class ThreadSerializer(serializers.ModelSerializer):
-    participants = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = Thread
@@ -21,8 +23,20 @@ class ThreadSerializer(serializers.ModelSerializer):
                 'Thread needs to have 2 participants')
         return value
 
+    def to_representation(self, data):
+        participants = [
+            {'id': obj.id, 'username': obj.username}
+            for obj in data.participants.all()
+        ]
+        representation = super().to_representation(data)
+        representation['participants'] = participants
+        return representation
+
     def to_internal_value(self, data: dict) -> dict:
-        return data
+        participants = data['participants']
+        validated_data = super().to_internal_value(data)
+        validated_data['participants'] = participants
+        return validated_data
 
     def create(self, validated_data: dict) -> Thread:
         participants = validated_data.pop('participants')
