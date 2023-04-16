@@ -61,3 +61,25 @@ def get_unread_messages_number(user: User) -> QuerySet[Message]:
     threads = Thread.objects.filter(participants=user)
     messages = Message.objects.select_related('sender', 'thread')
     return messages.filter(~Q(sender=user), is_read=False, thread__in=threads).count()
+
+
+def check_user_have_thread(thread_pk: int, user: User):
+    """
+    Check whether user have a thread with a `thread_id`.
+    """
+    return user.threads.filter(id=thread_pk).exists()
+
+
+def check_user_have_message(message_pk: int, user: User):
+    """
+    Check whether user has thread with the message.
+    """
+    return user.threads.filter(messages=message_pk)
+
+
+def is_user_sender(message_pk: int, user: User) -> bool:
+    """
+    Check whether user is sender of the message.
+    """
+    return user.messages.filter(id=message_pk).exists()
+
