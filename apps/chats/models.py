@@ -10,7 +10,9 @@ class Thread(models.Model):
     """
 
     participants = models.ManyToManyField(
-        AUTH_USER_MODEL, verbose_name='Owners of a thread'
+        AUTH_USER_MODEL,
+        related_name='threads',
+        verbose_name='Owners of a thread',
     )
     created = models.DateTimeField(
         'Thread creation date and time', auto_now_add=True
