@@ -1,6 +1,7 @@
 from requests import Request
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
@@ -20,6 +21,7 @@ class ThreadDestroyView(generics.DestroyAPIView):
 
 class ThreadListView(generics.ListAPIView):
     serializer_class = ThreadSerializer
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         user = self.request.user
@@ -39,6 +41,7 @@ class MessageCreationView(generics.CreateAPIView):
 
 class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
+    pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
         thread_id = self.kwargs['thread_id']
